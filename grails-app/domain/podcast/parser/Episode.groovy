@@ -18,7 +18,7 @@ class Episode {
     static constraints = {
         title nullable: false
         description nullable: true
-        guid nullable: false, unique: true
+        guid nullable: true
         hostedUrl nullable: true
         pubDate nullable: false
         episodeNumber nullable: true

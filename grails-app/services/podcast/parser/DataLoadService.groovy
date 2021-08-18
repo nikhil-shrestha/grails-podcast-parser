@@ -54,12 +54,11 @@ class DataLoadService {
     def allThreads = []
     for (int i = 0; i < 2; i++) {
       def records = readCsv(splitPath + filePrefix + i + fileExtension)
-      log.debug("{}", records)
       def arrayChunk = MiscUtils.partition(records, 100)
-      log.debug("{}", arrayChunk)
       arrayChunk.eachWithIndex { arr, int j ->
         allThreads << Thread.start {
           def arrIds = arr?.parallelStream()?.map { it.itunesId }?.collect(Collectors.toList())
+          log.debug(arrIds)
           def results = getBatchPodcast(arrIds);
           results?.parallelStream()?.forEach { entry ->
             podcastService.savePodcastFinal(entry)
@@ -92,7 +91,7 @@ class DataLoadService {
         allThreads << Thread.start {
           def arrIds = arr?.parallelStream()?.map { it.itunesId }?.collect(Collectors.toList())
           def results = getBatchPodcast(arrIds);
-          results?.parallelStream()?.forEach { entry ->
+          results?.each { entry ->
             podcastService.savePodcastFinal(entry)
           }
         }
