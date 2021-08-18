@@ -6,6 +6,6 @@ class Genres {
     Podcast podcast
 
     static constraints = {
-        name nullable: false, unique: true
+        name nullable: false
     }
 }

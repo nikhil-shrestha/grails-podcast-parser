@@ -45,13 +45,12 @@ class PodcastService {
         podcast.episodeCount = episodes.size()
         podcast.lastEpisodeDate = episodes.get(0).getPubDate()
 
-
         if (podcast.save(flush: true, failOnError: true)) {
           result?.getGenres()?.parallelStream()?.forEach { name ->
-            new Genres(name: name, podcast: podcast).save(flush: true)
+            if (!name.equalsIgnoreCase("Podcasts")) {
+              new Genres(name: name, podcast: podcast).save(flush: true)
+            }
           }
-
-
 
           episodes?.parallelStream()
               ?.forEach { entry ->
@@ -78,7 +77,7 @@ class PodcastService {
           status.setRollbackOnly()
         }
       } catch (Exception e) {
-        log.warn("[Episode] Exception::", e)
+        log.warn("Unable to Parse URL:: ", e)
         status.setRollbackOnly()
       }
     }

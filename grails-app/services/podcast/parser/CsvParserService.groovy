@@ -3,30 +3,54 @@ package podcast.parser
 
 class CsvParserService {
 
-  def processInputFile(directory = '') {
+  def splitLargeFile(lines, files){
     String inputfile = "file.csv";
-    def dataFile = new File(inputfile);
-    String splitPath = directory + '/splits/'
+    BufferedReader br = new BufferedReader(new FileReader(inputfile))
+
+    String splitPath = 'splits/'
     String filePrefix = 'FileNumber_'
     String fileExtension = '.csv'
-    int i
-    int fileNumber
-    if (!dataFile.exists()) {
-      log.debug "File does not exist"
-    } else {
-      i = 0
-      fileNumber = 0
-      new File(splitPath).mkdir()
-      File fileToWrite = new File(splitPath + filePrefix + fileNumber + fileExtension)
-      dataFile.eachLine { line ->
-        if (i > 10000) {
-          i = 0
-          fileNumber += 1
-          fileToWrite = new File(splitPath + filePrefix + fileNumber + fileExtension)
+
+    new File(splitPath).mkdir()
+
+    String strLine = null;
+    for (int i = 0; i < files; i++) {
+      def fstream1 = new FileWriter(splitPath + filePrefix + i + fileExtension); //creating a new file writer.
+      def out = new BufferedWriter(fstream1);
+      for (int j = 0; j < lines; j++) {   //iterating the reader to read only the first few lines of the csv as defined earlier
+        strLine = br.readLine()
+        if (strLine != null) {
+          def strar = strLine.split(",")
+          if (!strar[0].equals("id")) {     // removing heading row of the csv file
+            out.write(strLine)
+            out.newLine()
+          }
         }
-        i = i + 1
-        fileToWrite << ("$line\r\n")
       }
+      out.close()
+    }
+  }
+
+  def processInputFile(directory = '') {
+    int lines = 100  //set this to whatever number of lines you need in each file
+    int count = 0
+    String inputfile = "file.csv"
+    File file = new File(inputfile)
+    if (!file.exists()) {
+      log.warn "File does not exist"
+    } else {
+      Scanner scanner = new Scanner(file)
+      while (scanner.hasNextLine()) {  //counting the lines in the input file
+        scanner.nextLine()
+        count++
+      }
+      int files = 0
+      if ((count % lines) == 0) {
+        files = (count / lines) as int
+      } else {
+        files = ((count / lines) + 1) as int
+      }
+      splitLargeFile(lines, files);
     }
   }
 }

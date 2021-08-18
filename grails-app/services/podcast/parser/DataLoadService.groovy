@@ -47,16 +47,16 @@ class DataLoadService {
 
 
   def freshCsvParser() {
-    String splitPath = '/splits/'
+    String splitPath = 'splits/'
     String filePrefix = 'FileNumber_'
     String fileExtension = '.csv'
 
     def allThreads = []
-    for (int i = 0; i <= 10; i++) {
-      def records = readCsv(splitPath + filePrefix + i + fileExtension);
-      log.debug("{}", records);
+    for (int i = 0; i < 2; i++) {
+      def records = readCsv(splitPath + filePrefix + i + fileExtension)
+      log.debug("{}", records)
       def arrayChunk = MiscUtils.partition(records, 100)
-      log.debug("{}", arrayChunk);
+      log.debug("{}", arrayChunk)
       arrayChunk.eachWithIndex { arr, int j ->
         allThreads << Thread.start {
           def arrIds = arr?.parallelStream()?.map { it.itunesId }?.collect(Collectors.toList())
@@ -71,14 +71,14 @@ class DataLoadService {
     allThreads.each { it.join() }
 
     // TODO delete files and folders and update and delete products
-    new File(splitPath).deleteDir()
+//    new File(splitPath).deleteDir()
 //    if (fileToProgress.exists()) {
 //      fileToProgress.delete()
 //    }
   }
 
   def trendingCsvParser() {
-    String splitPath = '/splits/'
+    String splitPath = 'splits/'
     String filePrefix = 'FileNumber_'
     String fileExtension = '.csv'
 

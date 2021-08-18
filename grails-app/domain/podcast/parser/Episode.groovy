@@ -27,4 +27,8 @@ class Episode {
         link nullable: false
         type nullable: true
     }
+
+    static mapping = {
+        description type: 'text'
+    }
 }

@@ -7,7 +7,7 @@ class BootStrap {
 
   def init = { servletContext ->
     if (Podcast.count() == 0) {
-      csvParserService.processInputFile()
+//      csvParserService.processInputFile()
       dataLoadService.freshCsvParser()
     }
 //    dataLoadService.trendingCsvParser()

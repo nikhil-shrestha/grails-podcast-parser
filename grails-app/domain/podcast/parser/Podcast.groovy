@@ -56,4 +56,10 @@ class Podcast {
     episodeCount nullable: true
     lastEpisodeDate nullable: false
   }
+
+  static mapping = {
+    description type: 'text'
+    shortDescription type: 'text'
+    longDescription type: 'text'
+  }
 }
