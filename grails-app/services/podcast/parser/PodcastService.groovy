@@ -2,6 +2,8 @@ package podcast.parser
 
 import be.ceau.itunesapi.response.Result
 import grails.gorm.transactions.Transactional
+import groovy.sql.Sql
+import podcast.parser.model.GenreData
 
 @Transactional
 class PodcastService {
@@ -47,10 +49,27 @@ class PodcastService {
           podcast.lastEpisodeDate = episodes.get(0).getPubDate()
 
           if (podcast.save(flush: true, failOnError: true)) {
-            if (result?.getGenres()?.size()) {
-              result?.getGenres()?.parallelStream()?.forEach { name ->
-                if (!name.equalsIgnoreCase("Podcasts")) {
-                  new Genres(name: name, podcast: podcast).save(flush: true)
+            GenreData[] genreData = new GenreData[result.getGenreIds().size()];
+            int i = 0;
+            for (String id : result.getGenreIds()) {
+              genreData[i] = new GenreData();
+              genreData[i].id = Long.parseLong(id);
+              i++;
+            }
+
+            i = 0;
+            for (String name : result.getGenres()) {
+              genreData[i].name = name;
+              i++;
+            }
+
+            for (GenreData genre : genreData) {
+              if (genre.id != 26 || !genre.name.equals("Podcasts")) {
+                def findGenre = Genres.findByName(genre.name)
+                if (findGenre) {
+                  findGenre.addToPodcasts(podcasts: podcast)
+                } else {
+                  new Genres(name: genre.name).save(flush: true).addToPodcasts(podcasts: podcast)
                 }
               }
             }
@@ -135,6 +154,7 @@ class PodcastService {
 
     }
     sessionFactory.currentSession.clear()
+    return true
   }
 
 
@@ -179,6 +199,4 @@ class PodcastService {
     }
     sessionFactory.currentSession.clear()
   }
-
-
 }

@@ -28,6 +28,7 @@ class Podcast {
 
   Date lastEpisodeDate
 
+  List<Genres> genres
   static hasMany = [genres: Genres, episodes: Episode]
 
   static constraints = {

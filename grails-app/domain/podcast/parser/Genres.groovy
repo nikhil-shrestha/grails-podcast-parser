@@ -3,9 +3,10 @@ package podcast.parser
 class Genres {
 
     String name
-    Podcast podcast
+
+    static hasMany = [podcasts: Podcast]
 
     static constraints = {
-        name nullable: false
+        name nullable: false, unique: true
     }
 }
